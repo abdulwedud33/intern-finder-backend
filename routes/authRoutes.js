@@ -3,10 +3,10 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// Register Intern
+// Register Interns
 router.post('/register/intern', authController.registerIntern);
 
-// Register Client
+// Register Clients
 router.post('/register/client', authController.registerClient);
 
 module.exports = router;
