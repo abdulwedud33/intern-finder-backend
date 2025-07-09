@@ -1,5 +1,6 @@
 const Application = require('../models/Application');
 const Listing = require('../models/Listing');
+const sendResponse = require('../utils/sendResponse');
 
 // Intern applies to a listing
 exports.applyToListing = async (req, res) => {
@@ -10,13 +11,13 @@ exports.applyToListing = async (req, res) => {
     // Validate that listing exists
     const listing = await Listing.findById(listingId);
     if (!listing) {
-      return res.status(404).json({ message: 'Listing not found.' });
+      return sendResponse(res, 404, false, null, 'Listing not found.');
     }
 
     // Prevent duplicate applications
     const existingApp = await Application.findOne({ internId, listingId });
     if (existingApp) {
-      return res.status(409).json({ message: 'You have already applied to this listing.' });
+      return sendResponse(res, 409, false, null, 'You have already applied to this listing.');
     }
 
     // Save the application
@@ -26,8 +27,8 @@ exports.applyToListing = async (req, res) => {
       type: listing.type, // Use the type from the listing
     });
 
-    res.status(201).json({ message: 'Application submitted successfully.', application });
+    sendResponse(res, 201, true, application, 'Application submitted successfully.');
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    sendResponse(res, 500, false, null, err.message);
   }
 };

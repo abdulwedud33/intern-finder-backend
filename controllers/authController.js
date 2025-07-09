@@ -1,20 +1,21 @@
 const User = require('../models/User');
 const hashPassword = require('../utils/hashPassword');
 const generateToken = require('../utils/generateToken');
+const sendResponse = require('../utils/sendResponse');
 
 // Register Intern
 exports.registerIntern = async (req, res) => {
   try {
     const { name, email, password, type } = req.body;
     if (!name || !email || !password || !type) {
-      return res.status(400).json({ message: 'All fields are required for intern registration.' });
+      return sendResponse(res, 400, false, null, 'All fields are required for intern registration.');
     }
     if (!['free', 'paid'].includes(type)) {
-      return res.status(400).json({ message: 'Type must be either "free" or "paid".' });
+      return sendResponse(res, 400, false, null, 'Type must be either "free" or "paid".');
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: 'Email already in use.' });
+      return sendResponse(res, 409, false, null, 'Email already in use.');
     }
     const hashedPassword = await hashPassword(password);
     const user = await User.create({
@@ -25,7 +26,7 @@ exports.registerIntern = async (req, res) => {
       type,
     });
     const token = generateToken(user._id);
-    res.status(201).json({
+    sendResponse(res, 201, true, {
       token,
       user: {
         _id: user._id,
@@ -34,9 +35,9 @@ exports.registerIntern = async (req, res) => {
         role: user.role,
         type: user.type,
       },
-    });
+    }, 'Intern registered successfully');
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    sendResponse(res, 500, false, null, err.message);
   }
 };
 
@@ -45,11 +46,11 @@ exports.registerClient = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required for client registration.' });
+      return sendResponse(res, 400, false, null, 'All fields are required for client registration.');
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: 'Email already in use.' });
+      return sendResponse(res, 409, false, null, 'Email already in use.');
     }
     const hashedPassword = await hashPassword(password);
     const user = await User.create({
@@ -59,7 +60,7 @@ exports.registerClient = async (req, res) => {
       role: 'client',
     });
     const token = generateToken(user._id);
-    res.status(201).json({
+    sendResponse(res, 201, true, {
       token,
       user: {
         _id: user._id,
@@ -67,8 +68,8 @@ exports.registerClient = async (req, res) => {
         email: user.email,
         role: user.role,
       },
-    });
+    }, 'Client registered successfully');
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    sendResponse(res, 500, false, null, err.message);
   }
 };

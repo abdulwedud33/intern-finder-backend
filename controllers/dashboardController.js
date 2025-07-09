@@ -1,6 +1,7 @@
 const Application = require('../models/Application');
 const Listing = require('../models/Listing');
 const Feedback = require('../models/Feedback');
+const sendResponse = require('../utils/sendResponse');
 
 // Intern Dashboard: fetch applications and feedback for the logged-in intern
 exports.getInternDashboard = async (req, res) => {
@@ -16,12 +17,9 @@ exports.getInternDashboard = async (req, res) => {
       .populate('clientId', 'name email')
       .populate('listingId', 'title');
 
-    res.json({
-      applications,
-      feedbacks,
-    });
+    sendResponse(res, 200, true, { applications, feedbacks }, 'Dashboard data fetched successfully');
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    sendResponse(res, 500, false, null, err.message);
   }
 };
 
@@ -38,11 +36,8 @@ exports.getClientDashboard = async (req, res) => {
       .populate('internId', 'name email')
       .populate('listingId', 'title');
 
-    res.json({
-      listings,
-      applications,
-    });
+    sendResponse(res, 200, true, { listings, applications }, 'Dashboard data fetched successfully');
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    sendResponse(res, 500, false, null, err.message);
   }
 };

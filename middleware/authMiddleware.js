@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const sendResponse = require('../utils/sendResponse');
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided, authorization denied.' });
+    return sendResponse(res, 401, false, null, 'No token provided, authorization denied.');
   }
 
   const token = authHeader.split(' ')[1];
@@ -13,7 +14,7 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid token, authorization denied.' });
+    return sendResponse(res, 401, false, null, 'Invalid token, authorization denied.');
   }
 };
 
