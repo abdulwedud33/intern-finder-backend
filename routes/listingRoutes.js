@@ -10,6 +10,9 @@ router.use(authMiddleware);
 // Create Listing
 router.post('/', listingController.createListing);
 
+// Search Listings
+router.get('/search', listingController.searchListings);
+
 // Edit Listing
 router.put('/:id', listingController.editListing);
 

@@ -37,4 +37,7 @@ const listingSchema = new mongoose.Schema(
   }
 );
 
+// Add index for search performance
+listingSchema.index({ type: 1, location: 1, skills: 1 });
+
 module.exports = mongoose.model('Listing', listingSchema);

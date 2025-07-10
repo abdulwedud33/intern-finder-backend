@@ -60,3 +60,35 @@ exports.deleteListing = async (req, res) => {
     sendResponse(res, 500, false, null, err.message);
   }
 };
+
+// Search listings by type, location, and skills
+exports.searchListings = async (req, res) => {
+  try {
+    const { type, location, skills } = req.query;
+    const filter = {};
+
+    // Filter by type (exact match)
+    if (type && ['free', 'paid'].includes(type)) {
+      filter.type = type;
+    }
+
+    // Filter by location (case-insensitive partial match)
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+
+    // Filter by skills (match listings that include any skill in the array)
+    if (skills) {
+      const skillsArray = Array.isArray(skills) ? skills : [skills];
+      filter.skills = { $in: skillsArray };
+    }
+
+    const results = await Listing.find(filter)
+      .populate('clientId', 'name email')
+      .sort({ createdAt: -1 });
+
+    sendResponse(res, 200, true, results, 'Search results');
+  } catch (err) {
+    sendResponse(res, 500, false, null, err.message);
+  }
+};
