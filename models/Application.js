@@ -17,11 +17,6 @@ const applicationSchema = new mongoose.Schema(
       enum: ['free', 'paid'],
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['pending', 'completed'],
-      default: 'pending',
-    },
   },
   {
     timestamps: true,
